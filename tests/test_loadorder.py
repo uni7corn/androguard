@@ -1,6 +1,7 @@
-from androguard.core.bytecodes.dex_types import TypeMapItem
-
 import unittest
+
+from androguard.core.dex import TypeMapItem
+
 
 class LoadOrderTest(unittest.TestCase):
     def testLoadOrder(self):
@@ -15,6 +16,7 @@ class LoadOrderTest(unittest.TestCase):
             for dependency in dependencies[item]:
                 self.assertIn(dependency, treated)
             treated.append(item)
+
 
 if __name__ == '__main__':
     unittest.main()

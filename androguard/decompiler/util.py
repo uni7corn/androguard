@@ -15,6 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Allows type hinting of types not-yet-declared
+# in Python >= 3.7
+# see https://peps.python.org/pep-0563/
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from androguard.decompiler.graph import Graph
+
 from loguru import logger
 
 TYPE_DESCRIPTOR = {
@@ -71,28 +81,54 @@ ACCESS_FLAGS_METHODS = {
     0x20000: 'declared_synchronized',
 }
 
-ACCESS_ORDER = [0x1, 0x4, 0x2, 0x400, 0x8, 0x10, 0x80, 0x40, 0x20, 0x100, 0x800,
-                0x200, 0x1000, 0x2000, 0x4000, 0x10000, 0x20000]
+ACCESS_ORDER = [
+    0x1,
+    0x4,
+    0x2,
+    0x400,
+    0x8,
+    0x10,
+    0x80,
+    0x40,
+    0x20,
+    0x100,
+    0x800,
+    0x200,
+    0x1000,
+    0x2000,
+    0x4000,
+    0x10000,
+    0x20000,
+]
 
-TYPE_LEN = {'J': 2, 'D': 2, }
+TYPE_LEN = {
+    'J': 2,
+    'D': 2,
+}
 
 
-def get_access_class(access):
+def get_access_class(access: int) -> list[str]:
     sorted_access = [i for i in ACCESS_ORDER if i & access]
-    return [ACCESS_FLAGS_CLASSES.get(flag, 'unkn_%d' % flag)
-            for flag in sorted_access]
+    return [
+        ACCESS_FLAGS_CLASSES.get(flag, 'unkn_%d' % flag)
+        for flag in sorted_access
+    ]
 
 
-def get_access_method(access):
+def get_access_method(access: int) -> list[str]:
     sorted_access = [i for i in ACCESS_ORDER if i & access]
-    return [ACCESS_FLAGS_METHODS.get(flag, 'unkn_%d' % flag)
-            for flag in sorted_access]
+    return [
+        ACCESS_FLAGS_METHODS.get(flag, 'unkn_%d' % flag)
+        for flag in sorted_access
+    ]
 
 
-def get_access_field(access):
+def get_access_field(access: int) -> list[str]:
     sorted_access = [i for i in ACCESS_ORDER if i & access]
-    return [ACCESS_FLAGS_FIELDS.get(flag, 'unkn_%d' % flag)
-            for flag in sorted_access]
+    return [
+        ACCESS_FLAGS_FIELDS.get(flag, 'unkn_%d' % flag)
+        for flag in sorted_access
+    ]
 
 
 def build_path(graph, node1, node2, path=None):
@@ -143,8 +179,9 @@ def merge_inner(clsdict):
                 innerclass = innerclass[:-1]  # remove ';' of the name
                 mainclass += ';'
                 if mainclass in clsdict:
-                    clsdict[mainclass].add_subclass(innerclass,
-                                                    clsdict[classname])
+                    clsdict[mainclass].add_subclass(
+                        innerclass, clsdict[classname]
+                    )
                     clsdict[classname].name = innerclass
                     done[classname] = clsdict[classname]
                     del clsdict[classname]
@@ -165,7 +202,7 @@ def get_type_size(param):
     return TYPE_LEN.get(param, 1)
 
 
-def get_type(atype, size=None):
+def get_type(atype: str, size: int = None) -> str:
     """
     Retrieve the java type of a descriptor (e.g : I)
     """
@@ -187,7 +224,7 @@ def get_type(atype, size=None):
     return res
 
 
-def get_params_type(descriptor):
+def get_params_type(descriptor: str) -> list[str]:
     """
     Return the parameters type of a descriptor (e.g (IC)V)
     """
@@ -197,7 +234,9 @@ def get_params_type(descriptor):
     return []
 
 
-def create_png(cls_name, meth_name, graph, dir_name='graphs2'):
+def create_png(
+    cls_name: str, meth_name: str, graph: Graph, dir_name: str = 'graphs2'
+) -> None:
     """
     Creates a PNG from a given :class:`~androguard.decompiler.graph.Graph`.
 

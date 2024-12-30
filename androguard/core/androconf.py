@@ -1,14 +1,23 @@
-import sys
+# Allows type hinting of types not-yet-declared
+# in Python >= 3.7
+# see https://peps.python.org/pep-0563/
+from __future__ import annotations
+
 import os
-import logging
+import sys
 import tempfile
-from colorama import init, Fore
-from loguru import logger
+from typing import Union
 
 from androguard import __version__
-from androguard.core.api_specific_resources import load_permission_mappings, load_permissions
+from androguard.core.api_specific_resources import (
+    load_permission_mappings,
+    load_permissions,
+)
+
 ANDROGUARD_VERSION = __version__
 
+from colorama import Fore, init
+from loguru import logger
 
 # initialize colorama, only has an effect on windows
 init()
@@ -16,18 +25,18 @@ init()
 
 class InvalidResourceError(Exception):
     """
-    Invalid Resource Erorr is thrown by load_api_specific_resource_module
+    Invalid Resource Erorr is thrown by [load_api_specific_resource_module][androguard.core.androconf.load_api_specific_resource_module]
     """
+
     pass
 
 
-def is_ascii_problem(s):
+def is_ascii_problem(s: str) -> bool:
     """
     Test if a string contains other chars than ASCII
 
-    :param androguard.core.mutf8.MUTF8String s: a string to test
-    :return: True if string contains other chars than ASCII, False otherwise
-    :rtype: bool
+    :param s: a string to test
+    :returns: `True` if string contains other chars than ASCII, `False` otherwise
     """
     try:
         # As MUTF8Strings are actually bytes, we can simply check if they are ASCII or not
@@ -40,21 +49,16 @@ def is_ascii_problem(s):
 default_conf = {
     ## Configuration for executables used by androguard
     # Assume the binary is in $PATH, otherwise give full path
-
     # Runtime variables
     #
     # A path to the temporary directory
     "TMP_DIRECTORY": tempfile.gettempdir(),
-
     # Function to print stuff
     "PRINT_FCT": sys.stdout.write,
-
     # Default API level, if requested API is not available
     "DEFAULT_API": 16,  # this is the minimal API version we have
-
     # Session, for persistence
     "SESSION": None,
-
     # Color output configuration
     "COLORS": {
         "OFFSET": Fore.YELLOW,
@@ -77,15 +81,15 @@ default_conf = {
             "meth": Fore.CYAN,
             "type": Fore.BLUE,
             "field": Fore.GREEN,
-        },
-    },
+        }
+    }
 }
 
 
 class Configuration:
     instance = None
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         A Wrapper for the CONF object
         This creates a singleton, which has the same attributes everywhere.
@@ -112,11 +116,11 @@ class Configuration:
 CONF = Configuration()
 
 
-def is_android(filename):
+def is_android(filename: str) -> str:
     """
     Return the type of the file
 
-    :param filename : the filename
+    :param filename: the filename
     :returns: "APK", "DEX", None
     """
     if not filename:
@@ -127,10 +131,13 @@ def is_android(filename):
         return is_android_raw(f_bytes)
 
 
-def is_android_raw(raw):
+def is_android_raw(raw: bytes) -> str:
     """
     Returns a string that describes the type of file, for common Android
     specific formats
+
+    :param raw: the file bytes to check
+    :returns: the type of file
     """
     val = None
 
@@ -143,7 +150,7 @@ def is_android_raw(raw):
     # probably it would be better to rewrite this and add more sanity checks.
     if raw[0:2] == b"PK" and b'AndroidManifest.xml' in raw:
         val = "APK"
-        # check out 
+        # check out
     elif raw[0:3] == b"dex":
         val = "DEX"
     elif raw[0:3] == b"dey":
@@ -155,9 +162,10 @@ def is_android_raw(raw):
 
     return val
 
-def rrmdir(directory):
+
+def rrmdir(directory: str) -> None:
     """
-    Recursivly delete a directory
+    Recursively delete a directory
 
     :param directory: directory to remove
     """
@@ -169,10 +177,10 @@ def rrmdir(directory):
     os.rmdir(directory)
 
 
-def make_color_tuple(color):
+def make_color_tuple(color: str) -> tuple[int, int, int]:
     """
-    turn something like "#000000" into 0,0,0
-    or "#FFFFFF into "255,255,255"
+    turn something like `#000000` into `0,0,0`
+    or `#FFFFFF` into `255,255,255`
     """
     R = color[1:3]
     G = color[3:5]
@@ -185,7 +193,11 @@ def make_color_tuple(color):
     return R, G, B
 
 
-def interpolate_tuple(startcolor, goalcolor, steps):
+def interpolate_tuple(
+    startcolor: tuple[int, int, int],
+    goalcolor: tuple[int, int, int],
+    steps: int,
+) -> list[str]:
     """
     Take two RGB color sets and mix them over a specified number of steps.  Return the list
     """
@@ -228,9 +240,18 @@ def interpolate_tuple(startcolor, goalcolor, steps):
     return buffer
 
 
-def color_range(startcolor, goalcolor, steps):
+def color_range(
+    startcolor: tuple[int, int, int],
+    goalcolor: tuple[int, int, int],
+    steps: int,
+) -> list[str]:
     """
-    wrapper for interpolate_tuple that accepts colors as html ("#CCCCC" and such)
+    wrapper for interpolate_tuple that accepts colors as html (`#CCCCC` and such)
+
+    :param startcolor: the start RGB color tuple
+    :param goalcolor: the goal RGB color tuple
+    :param steps: amount of steps
+    :returns: the interpolated RGB tuple
     """
     start_tuple = make_color_tuple(startcolor)
     goal_tuple = make_color_tuple(goalcolor)
@@ -238,7 +259,9 @@ def color_range(startcolor, goalcolor, steps):
     return interpolate_tuple(start_tuple, goal_tuple, steps)
 
 
-def load_api_specific_resource_module(resource_name, api=None):
+def load_api_specific_resource_module(
+    resource_name: str, api: Union[str, int, None] = None
+) -> dict:
     """
     Load the module from the JSON files and return a dict, which might be empty
     if the resource could not be loaded.
@@ -247,13 +270,20 @@ def load_api_specific_resource_module(resource_name, api=None):
 
     :param resource_name: Name of the resource to load
     :param api: API version
-    :return: dict
+    :raises InvalidResourceError: if resource not found
+    :returns: dict
     """
-    loader = dict(aosp_permissions=load_permissions,
-                  api_permission_mappings=load_permission_mappings)
+    loader = dict(
+        aosp_permissions=load_permissions,
+        api_permission_mappings=load_permission_mappings,
+    )
 
     if resource_name not in loader:
-        raise InvalidResourceError("Invalid Resource '{}', not in [{}]".format(resource_name, ", ".join(loader.keys())))
+        raise InvalidResourceError(
+            "Invalid Resource '{}', not in [{}]".format(
+                resource_name, ", ".join(loader.keys())
+            )
+        )
 
     if not api:
         api = CONF["DEFAULT_API"]
@@ -262,9 +292,12 @@ def load_api_specific_resource_module(resource_name, api=None):
 
     if ret == {}:
         # No API mapping found, return default
-        logger.warning("API mapping for API level {} was not found! "
-                       "Returning default, which is API level {}".format(api, CONF['DEFAULT_API']))
+        logger.warning(
+            "API mapping for API level {} was not found! "
+            "Returning default, which is API level {}".format(
+                api, CONF['DEFAULT_API']
+            )
+        )
         ret = loader[resource_name](CONF['DEFAULT_API'])
 
     return ret
-

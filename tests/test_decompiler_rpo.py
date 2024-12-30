@@ -1,12 +1,8 @@
 """Tests for rpo."""
 
-import sys
-
-sys.path.append('.')
-
 import unittest
-from androguard.decompiler import graph
-from androguard.decompiler import node
+
+from androguard.decompiler import graph, node
 
 
 class NodeTest(node.Node):
@@ -62,7 +58,7 @@ class RpoTest(unittest.TestCase):
             'i': ['k'],
             'j': ['i'],
             'k': ['i', 'r'],
-            'l': ['h']
+            'l': ['h'],
         }
         n_map = self._createGraphFrom(edges)
         self.graph.compute_rpo()
@@ -80,7 +76,7 @@ class RpoTest(unittest.TestCase):
             'i': 12,
             'j': 4,
             'k': 11,
-            'l': 9
+            'l': 9,
         }
         self._verifyRpo(n_map, expected_rpo)
 
@@ -106,7 +102,7 @@ class RpoTest(unittest.TestCase):
             'z2': ['z1', 'z3'],
             'z3': ['z2', 'z4'],
             'z4': ['z3', 'z5'],
-            'z5': ['z4']
+            'z5': ['z4'],
         }
         n_map = self._createGraphFrom(edges)
         self.graph.compute_rpo()
@@ -132,7 +128,7 @@ class RpoTest(unittest.TestCase):
             'z2': 13,
             'z3': 14,
             'z4': 15,
-            'z5': 16
+            'z5': 16,
         }
         self._verifyRpo(n_map, expected_rpo)
 
@@ -145,7 +141,7 @@ class RpoTest(unittest.TestCase):
             'x21': ['x22'],
             'x22': ['x21'],
             'y1': ['y2', 'x11'],
-            'y2': ['x21']
+            'y2': ['x21'],
         }
         n_map = self._createGraphFrom(edges)
         self.graph.compute_rpo()
@@ -157,7 +153,7 @@ class RpoTest(unittest.TestCase):
             'x21': 6,
             'x22': 7,
             'y1': 2,
-            'y2': 5
+            'y2': 5,
         }
         self._verifyRpo(n_map, expected_rpo)
 
@@ -168,7 +164,7 @@ class RpoTest(unittest.TestCase):
             'w': ['x1', 'x2'],
             'x2': ['x1'],
             'y1': ['y2'],
-            'y2': ['x2']
+            'y2': ['x2'],
         }
         n_map = self._createGraphFrom(edges)
         self.graph.compute_rpo()
@@ -181,7 +177,7 @@ class RpoTest(unittest.TestCase):
             None: 'r',
             'r': ['x1', 'y1', 'y2'],
             'x1': ['x2'],
-            'x2': ['y1', 'y2']
+            'x2': ['y1', 'y2'],
         }
         n_map = self._createGraphFrom(edges)
         self.graph.compute_rpo()
@@ -200,7 +196,7 @@ class RpoTest(unittest.TestCase):
             'e': ['c', 'f'],
             'f': ['i'],
             'g': ['h'],
-            'h': ['d', 'f', 'i']
+            'h': ['d', 'f', 'i'],
         }
         n_map = self._createGraphFrom(edges)
         self.graph.compute_rpo()
@@ -215,7 +211,7 @@ class RpoTest(unittest.TestCase):
             'f': 7,
             'g': 4,
             'h': 5,
-            'i': 10
+            'i': 10,
         }
         self._verifyRpo(n_map, expected_rpo)
 
@@ -231,7 +227,7 @@ class RpoTest(unittest.TestCase):
             'x4': ['x3', 'x5'],
             'x5': ['x4', 'x6'],
             'x6': ['x5', 'x7'],
-            'x7': ['x6']
+            'x7': ['x6'],
         }
         n_map = self._createGraphFrom(edges)
         self.graph.compute_rpo()
@@ -246,7 +242,7 @@ class RpoTest(unittest.TestCase):
             'x5': 8,
             'x6': 9,
             'x7': 10,
-            'y': 2
+            'y': 2,
         }
         self._verifyRpo(n_map, expected_rpo)
 
@@ -259,7 +255,7 @@ class RpoTest(unittest.TestCase):
             'c': ['a', 'd', 'g'],
             'd': ['e'],
             'e': ['f'],
-            'f': ['a', 'd', 'g']
+            'f': ['a', 'd', 'g'],
         }
         n_map = self._createGraphFrom(edges)
         self.graph.compute_rpo()
@@ -272,7 +268,7 @@ class RpoTest(unittest.TestCase):
             'd': 5,
             'e': 6,
             'f': 7,
-            'g': 8
+            'g': 8,
         }
         self._verifyRpo(n_map, expected_rpo)
 
@@ -290,7 +286,7 @@ class RpoTest(unittest.TestCase):
             'n9': ['n10', 'n11', 'n12'],
             'n10': ['n11'],
             'n11': ['n7'],
-            'n12': ['n10']
+            'n12': ['n10'],
         }
         n_map = self._createGraphFrom(edges)
         self.graph.compute_rpo()
@@ -307,7 +303,7 @@ class RpoTest(unittest.TestCase):
             'n9': 5,
             'n10': 7,
             'n11': 8,
-            'n12': 6
+            'n12': 6,
         }
         self._verifyRpo(n_map, expected_rpo)
 

@@ -16,16 +16,17 @@
 # limitations under the License.
 
 from collections import defaultdict
-from androguard.decompiler.opcode_ins import INSTRUCTION_SET
-from androguard.decompiler.instruction import MoveExceptionExpression
-from androguard.decompiler.node import Node
-from androguard.decompiler.util import get_type
 
 from loguru import logger
 
+from androguard.decompiler.instruction import MoveExceptionExpression
+from androguard.decompiler.node import Node
+from androguard.decompiler.opcode_ins import INSTRUCTION_SET
+from androguard.decompiler.util import get_type
+
 
 class BasicBlock(Node):
-    def __init__(self, name, block_ins):
+    def __init__(self, name: str, block_ins: list) -> None:
         super().__init__(name)
         self.ins = block_ins
         self.ins_range = None
@@ -33,26 +34,26 @@ class BasicBlock(Node):
         self.var_to_declare = set()
         self.catch_type = None
 
-    def get_ins(self):
+    def get_ins(self) -> list:
         return self.ins
 
-    def get_loc_with_ins(self):
+    def get_loc_with_ins(self) -> list:
         if self.loc_ins is None:
             self.loc_ins = list(zip(range(*self.ins_range), self.ins))
         return self.loc_ins
 
-    def remove_ins(self, loc, ins):
+    def remove_ins(self, loc, ins) -> None:
         self.ins.remove(ins)
         self.loc_ins.remove((loc, ins))
 
-    def add_ins(self, new_ins_list):
+    def add_ins(self, new_ins_list: list) -> None:
         for new_ins in new_ins_list:
             self.ins.append(new_ins)
 
     def add_variable_declaration(self, variable):
         self.var_to_declare.add(variable)
 
-    def number_ins(self, num):
+    def number_ins(self, num: int) -> int:
         last_ins_num = num + len(self.ins)
         self.ins_range = [num, last_ins_num]
         self.loc_ins = None
@@ -190,8 +191,9 @@ class Condition:
         return loc_ins
 
     def visit(self, visitor):
-        return visitor.visit_short_circuit_condition(self.isnot, self.isand,
-                                                     self.cond1, self.cond2)
+        return visitor.visit_short_circuit_condition(
+            self.isnot, self.isand, self.cond1, self.cond2
+        )
 
     def __str__(self):
         if self.isnot:
@@ -325,19 +327,19 @@ def build_node_from_block(block, vmap, gen_ret, exception_type=None):
             fillarray = block.get_special_ins(idx)
             lins.append(_ins(ins, vmap, fillarray))
         # invoke-kind[/range]
-        elif 0x6e <= opcode <= 0x72 or 0x74 <= opcode <= 0x78:
+        elif 0x6E <= opcode <= 0x72 or 0x74 <= opcode <= 0x78:
             lins.append(_ins(ins, vmap, gen_ret))
         # filled-new-array[/range]
         elif 0x24 <= opcode <= 0x25:
             lins.append(_ins(ins, vmap, gen_ret.new()))
         # move-result*
-        elif 0xa <= opcode <= 0xc:
+        elif 0xA <= opcode <= 0xC:
             lins.append(_ins(ins, vmap, gen_ret.last()))
         # move-exception
-        elif opcode == 0xd:
+        elif opcode == 0xD:
             lins.append(_ins(ins, vmap, exception_type))
         # monitor-{enter,exit}
-        elif 0x1d <= opcode <= 0x1e:
+        elif 0x1D <= opcode <= 0x1E:
             idx += ins.get_length()
             continue
         else:
@@ -345,15 +347,15 @@ def build_node_from_block(block, vmap, gen_ret, exception_type=None):
         idx += ins.get_length()
     name = block.get_name()
     # return*
-    if 0xe <= opcode <= 0x11:
+    if 0xE <= opcode <= 0x11:
         node = ReturnBlock(name, lins)
     # {packed,sparse}-switch
-    elif 0x2b <= opcode <= 0x2c:
+    elif 0x2B <= opcode <= 0x2C:
         idx -= ins.get_length()
         values = block.get_special_ins(idx)
         node = SwitchBlock(name, values, lins)
     # if-test[z]
-    elif 0x32 <= opcode <= 0x3d:
+    elif 0x32 <= opcode <= 0x3D:
         node = CondBlock(name, lins)
         node.off_last_ins = ins.get_ref_off()
     # throw
@@ -361,7 +363,7 @@ def build_node_from_block(block, vmap, gen_ret, exception_type=None):
         node = ThrowBlock(name, lins)
     else:
         # goto*
-        if 0x28 <= opcode <= 0x2a:
+        if 0x28 <= opcode <= 0x2A:
             lins.pop()
         node = StatementBlock(name, lins)
     return node

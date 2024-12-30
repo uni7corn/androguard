@@ -1,16 +1,29 @@
-![banner](https://raw.githubusercontent.com/androguard/androguard/master/assets/web/androguard.jpeg)
+![banner](https://raw.githubusercontent.com/androguard/androguard/master/assets/web/androguardwithname.jpg)
 
 # Androguard
 
-[![Build Status](https://travis-ci.org/androguard/androguard.svg?branch=master)](https://travis-ci.org/androguard/androguard)
-[![Documentation Status](https://github.com/androguard/androguard/wiki)](https://github.com/androguard/androguard/wiki)
-[![PyPI version](https://badge.fury.io/py/androguard.svg)](https://badge.fury.io/py/androguard)
+[![PyPI Upload](https://github.com/androguard/androguard/actions/workflows/pythonpublish.yml/badge.svg)](https://github.com/androguard/androguard/actions/workflows/pythonpublish.yml)
+![PyPI - Version](https://img.shields.io/pypi/v/androguard)
+![Static Badge](https://img.shields.io/badge/Documentation-InProgress-red)
+
+New tool: Goauld [Dynamic injection tool for Linux/Android ](https://github.com/androguard/goauld)
 
 ## Installation
+Quick installation:
+~~~~
+pip install androguard
+~~~~
 
-Please see the [wiki](https://github.com/androguard/androguard/wiki)
+> [!IMPORTANT]
+> Versions >= 4.0.0 are new releases after a long time, where the project has substantial differences from the previous stable version 3.3.5 from 2019. This means that certain functionalities have been removed. If you notice an issue with your project using the latest version, please open up an [issue](https://github.com/androguard/androguard/issues).
 
-... let's start reversing!
+## Documentation
+**Documentation contains outdated information - In progress of updating**
+
+The [Github Pages Documentation](http://androguard.github.io/androguard/) is the most up to date source.
+
+Additional documentation that contains outdated information is available at [ReadTheDocs](http://androguard.readthedocs.io/en/latest/).
+
 
 ## Features
 
@@ -31,12 +44,6 @@ Androguard + tools: Anthony Desnos (desnos at t0t0.fr).
 
 DAD (DAD is A Decompiler): Geoffroy Gueguen (geoffroy dot gueguen at gmail dot com)
 
-## Documentation
-
-Find the documentation for master on [ReadTheDocs](http://androguard.readthedocs.io/en/latest/).
-
-There are some (probably broken/outdated) examples and demos in the folders [demos](https://github.com/androguard/androguard/tree/master/demos) and [examples](https://github.com/androguard/androguard/tree/master/examples).
-
 ## Projects using Androguard
 In alphabetical order
 
@@ -53,6 +60,7 @@ In alphabetical order
 * [MobSF](https://github.com/MobSF/Mobile-Security-Framework-MobSF)
 * [qiew](https://github.com/mtivadar/qiew)
 * [Quark-Engine](https://github.com/quark-engine/quark-engine)
+* [Virustotal](https://virustotal.readme.io/reference/androguard)
 * [Viper Framework](https://github.com/viper-framework/viper)
 * ... and many more!
 
@@ -62,7 +70,7 @@ You are using Androguard and are not listed here? Just create a [ticket](https:/
 
 ### Androguard
 
-Copyright (C) 2012 - 2023, Anthony Desnos (desnos at t0t0.fr)
+Copyright (C) 2012 - 2024, Anthony Desnos (desnos at t0t0.fr)
 All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
